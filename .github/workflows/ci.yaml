@@ -107,10 +107,10 @@ jobs:
         with:
           report-path: './*-tests.junit.xml'
           summary-delta-report: true
-          insights-report: true
           flaky-rate-report: true
           fail-rate-report: true
           slowest-report: true
+          previous-results-report: true
           upload-artifact: true
           artifact-name: 'unit-tests-ctrf-report'
           integrations-config: |
@@ -254,10 +254,10 @@ jobs:
         with:
           report-path: './e2e-tests.junit.xml'
           summary-delta-report: true
-          insights-report: true
           flaky-rate-report: true
           fail-rate-report: true
           slowest-report: true
+          previous-results-report: true
           upload-artifact: true
           artifact-name: "${{ matrix.deployment }}-ctrf-report"
           integrations-config: |
