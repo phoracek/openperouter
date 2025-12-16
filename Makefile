@@ -75,9 +75,9 @@ vet: ## Run go vet against code.
 	go vet ./...
 
 .PHONY: test
-test: fmt vet envtest ## Run tests.
-	KUBEBUILDER_ASSETS="$(shell $(ENVTEST) use $(ENVTEST_K8S_VERSION) --bin-dir $(LOCALBIN) -p path)" go test $$(go list ./... | grep -v e2etest) -coverprofile cover.out
-	sudo -E sh -c "umask 0; PATH=${GOPATH}/bin:$(pwd)/bin:${PATH} go test -tags=runasroot -v -race ./internal/hostnetwork"
+test: fmt vet envtest gotestsum ## Run tests.
+	KUBEBUILDER_ASSETS="$(shell $(ENVTEST) use $(ENVTEST_K8S_VERSION) --bin-dir $(LOCALBIN) -p path)" $(GOTESTSUM) --junitfile unit-tests.junit.xml --format pkgname -- $$(go list ./... | grep -v e2etest) -coverprofile cover.out
+	sudo -E sh -c "umask 0; PATH=${GOPATH}/bin:$(pwd)/bin:${PATH} $(GOTESTSUM) --junitfile hostnetwork-tests.junit.xml --format pkgname -- -tags=runasroot -v -race ./internal/hostnetwork"
 
 ##@ Build
 
@@ -141,6 +141,7 @@ KUBECONFIG_PATH ?= $(LOCALBIN)/kubeconfig
 VALIDATOR_PATH ?= $(LOCALBIN)/validatehost
 APIDOCSGEN ?= $(LOCALBIN)/crd-ref-docs
 HUGO ?= $(LOCALBIN)/hugo
+GOTESTSUM ?= $(LOCALBIN)/gotestsum
 export KUBECONFIG=$(KUBECONFIG_PATH)
 
 ## Tool Versions
@@ -154,6 +155,7 @@ HELM_VERSION ?= v3.12.3
 HELM_DOCS_VERSION ?= v1.10.0
 APIDOCSGEN_VERSION ?= v0.0.12
 HUGO_VERSION ?= v0.147.8
+GOTESTSUM_VERSION ?= v1.12.0
 
 # Kind node image configuration
 KIND_NODE_VERSION ?= v1.32.2
@@ -285,6 +287,12 @@ ginkgo: $(GINKGO) ## Download ginkgo locally if necessary. If wrong version is i
 $(GINKGO): $(LOCALBIN)
 	test -s $(LOCALBIN)/ginkgo && $(LOCALBIN)/ginkgo version | grep -q $(GINKGO_VERSION) || \
 	GOBIN=$(LOCALBIN) go install github.com/onsi/ginkgo/v2/ginkgo@$(GINKGO_VERSION)
+
+.PHONY: gotestsum
+gotestsum: $(GOTESTSUM) ## Download gotestsum locally if necessary. If wrong version is installed, it will be overwritten.
+$(GOTESTSUM): $(LOCALBIN)
+	test -s $(LOCALBIN)/gotestsum && $(LOCALBIN)/gotestsum --version | grep -q $(GOTESTSUM_VERSION) || \
+	GOBIN=$(LOCALBIN) go install gotest.tools/gotestsum@$(GOTESTSUM_VERSION)
 
 kind: $(KIND) ## Download kind locally if necessary. If wrong version is installed, it will be overwritten.
 $(KIND): $(LOCALBIN)

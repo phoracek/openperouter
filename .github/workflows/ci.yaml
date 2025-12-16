@@ -102,6 +102,20 @@ jobs:
         run: |
           make test
 
+      - name: Publish Test Report with Insights
+        uses: ctrf-io/github-test-reporter@v1
+        with:
+          report-path: './*-tests.junit.xml'
+          summary-delta-report: true
+          insights-report: true
+          flaky-rate-report: true
+          fail-rate-report: true
+          slowest-report: true
+          upload-artifact: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        if: always()
+
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v8
         with:
