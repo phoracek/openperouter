@@ -110,7 +110,7 @@ jobs:
           flaky-rate-report: true
           fail-rate-report: true
           slowest-report: true
-          previous-results-report: true
+          fetch-previous-results: true
           upload-artifact: true
           artifact-name: 'unit-tests-ctrf-report'
           integrations-config: |
@@ -257,7 +257,7 @@ jobs:
           flaky-rate-report: true
           fail-rate-report: true
           slowest-report: true
-          previous-results-report: true
+          fetch-previous-results: true
           upload-artifact: true
           artifact-name: "${{ matrix.deployment }}-ctrf-report"
           integrations-config: |
