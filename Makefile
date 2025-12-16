@@ -1,3 +1,4 @@
+# HA!
 # Image URL to use all building/pushing image targets
 IMG_TAG ?= main
 IMG_REPO ?= quay.io/openperouter
