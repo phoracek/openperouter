@@ -102,6 +102,36 @@ jobs:
         run: |
           make test
 
+      - name: Publish test report
+        uses: ctrf-io/github-test-reporter@v1
+        with:
+          report-path: './*-tests.junit.xml'
+          summary-delta-report: true
+          flaky-rate-report: true
+          fail-rate-report: true
+          slowest-report: true
+          fetch-previous-results: true
+          upload-artifact: true
+          artifact-name: 'unit-tests-ctrf-report'
+          integrations-config: |
+            {
+              "junit-to-ctrf": {
+                "enabled": true,
+                "action": "convert",
+                "options": {
+                  "output": "./ctrf-report.json",
+                  "toolname": "junit-to-ctrf",
+                  "useSuiteName": false,
+                  "env": {
+                    "appName": "openperouter"
+                  }
+                }
+              }
+            }
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        if: always()
+
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v8
         with:
@@ -218,6 +248,37 @@ jobs:
             export GINKGO_ARGS="--skip='Router Host configuration'"
           fi
           make e2etests
+
+      - name: Publish test report
+        uses: ctrf-io/github-test-reporter@v1
+        with:
+          report-path: './e2e-tests.junit.xml'
+          summary-delta-report: true
+          flaky-rate-report: true
+          fail-rate-report: true
+          slowest-report: true
+          fetch-previous-results: true
+          upload-artifact: true
+          artifact-name: "${{ matrix.deployment }}-ctrf-report"
+          integrations-config: |
+            {
+              "junit-to-ctrf": {
+                "enabled": true,
+                "action": "convert",
+                "options": {
+                  "output": "./${{ matrix.deployment }}-ctrf-report.json",
+                  "toolname": "junit-to-ctrf",
+                  "useSuiteName": false,
+                  "env": {
+                    "appName": "openperouter",
+                    "deployment": "${{ matrix.deployment }}"
+                  }
+                }
+              }
+            }
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        if: always()
 
       - name: Export kind logs
         if: ${{ failure() }}
