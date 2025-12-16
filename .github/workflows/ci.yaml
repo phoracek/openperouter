@@ -251,7 +251,7 @@ jobs:
       - name: Publish E2E Test Report with Insights
         uses: ctrf-io/github-test-reporter@v1
         with:
-          report-path: './${{ matrix.deployment }}-e2e-tests.junit.xml'
+          report-path: './e2e-tests.junit.xml'
           summary-delta-report: true
           insights-report: true
           flaky-rate-report: true
