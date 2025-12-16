@@ -102,7 +102,7 @@ jobs:
         run: |
           make test
 
-      - name: Publish Test Report with Insights
+      - name: Publish test report
         uses: ctrf-io/github-test-reporter@v1
         with:
           report-path: './*-tests.junit.xml'
@@ -249,7 +249,7 @@ jobs:
           fi
           make e2etests
 
-      - name: Publish E2E Test Report with Insights
+      - name: Publish test report
         uses: ctrf-io/github-test-reporter@v1
         with:
           report-path: './e2e-tests.junit.xml'
