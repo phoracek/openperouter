@@ -112,6 +112,7 @@ jobs:
           fail-rate-report: true
           slowest-report: true
           upload-artifact: true
+          artifact-name: 'unit-tests-ctrf-report'
           integrations-config: |
             {
               "junit-to-ctrf": {
@@ -258,6 +259,7 @@ jobs:
           fail-rate-report: true
           slowest-report: true
           upload-artifact: true
+          artifact-name: "${{ matrix.deployment }}-ctrf-report"
           integrations-config: |
             {
               "junit-to-ctrf": {
