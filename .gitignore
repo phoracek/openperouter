@@ -15,6 +15,7 @@ Dockerfile.cross
 
 # Test reports
 *-tests.junit.xml
+*-ctrf-report.json
 
 # Go workspace file
 go.work

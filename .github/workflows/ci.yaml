@@ -122,7 +122,7 @@ jobs:
                   "toolname": "junit-to-ctrf",
                   "useSuiteName": false,
                   "env": {
-                    "appName": "my-app"
+                    "appName": "openperouter"
                   }
                 }
               }
@@ -247,6 +247,36 @@ jobs:
             export GINKGO_ARGS="--skip='Router Host configuration'"
           fi
           make e2etests
+
+      - name: Publish E2E Test Report with Insights
+        uses: ctrf-io/github-test-reporter@v1
+        with:
+          report-path: './e2e-tests.junit.xml'
+          summary-delta-report: true
+          insights-report: true
+          flaky-rate-report: true
+          fail-rate-report: true
+          slowest-report: true
+          upload-artifact: true
+          integrations-config: |
+            {
+              "junit-to-ctrf": {
+                "enabled": true,
+                "action": "convert",
+                "options": {
+                  "output": "./ctrf-report.json",
+                  "toolname": "junit-to-ctrf",
+                  "useSuiteName": false,
+                  "env": {
+                    "appName": "openperouter",
+                    "deployment": "${{ matrix.deployment }}"
+                  }
+                }
+              }
+            }
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        if: always()
 
       - name: Export kind logs
         if: ${{ failure() }}
