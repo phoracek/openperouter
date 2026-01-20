@@ -86,13 +86,11 @@ func NewStatusManager(updateChannel chan event.GenericEvent, nodeName, namespace
 
 // ReportResourceSuccess implements StatusReporter interface
 func (er *StatusManager) ReportResourceSuccess(kind ResourceKind, resourceName string) {
-	// Remove any previous failure from cache
 	er.failedResourceCacheMutex.Lock()
-	key := string(kind) + ":" + resourceName
+	key := fmt.Sprintf("%s:%s", kind, resourceName)
 	delete(er.failedResourceCache, key)
 	er.failedResourceCacheMutex.Unlock()
 
-	// Trigger reconciliation
 	er.sendTriggerEvent()
 
 	er.logger.Debug("reported success",
@@ -104,9 +102,8 @@ func (er *StatusManager) ReportResourceSuccess(kind ResourceKind, resourceName s
 func (er *StatusManager) ReportResourceFailure(kind ResourceKind, resourceName string, err error) {
 	errorMessage := fmt.Sprintf("failed: %v", err)
 
-	// Store failure in cache
 	er.failedResourceCacheMutex.Lock()
-	key := string(kind) + ":" + resourceName
+	key := fmt.Sprintf("%s:%s", kind, resourceName)
 	er.failedResourceCache[key] = &failedResourceCacheEntry{
 		ResourceKind: kind,
 		ResourceName: resourceName,
@@ -115,7 +112,6 @@ func (er *StatusManager) ReportResourceFailure(kind ResourceKind, resourceName s
 	}
 	er.failedResourceCacheMutex.Unlock()
 
-	// Trigger reconciliation
 	er.sendTriggerEvent()
 
 	er.logger.Debug("reported failure",
@@ -126,14 +122,12 @@ func (er *StatusManager) ReportResourceFailure(kind ResourceKind, resourceName s
 
 // ReportResourceRemoved implements StatusReporter interface
 func (er *StatusManager) ReportResourceRemoved(kind ResourceKind, resourceName string) {
-	// Remove any failure entry from cache
 	er.failedResourceCacheMutex.Lock()
-	key := string(kind) + ":" + resourceName
+	key := fmt.Sprintf("%s:%s", kind, resourceName)
 	_, existed := er.failedResourceCache[key]
 	delete(er.failedResourceCache, key)
 	er.failedResourceCacheMutex.Unlock()
 
-	// Trigger reconciliation only if the resource was actually in the cache
 	if existed {
 		er.sendTriggerEvent()
 		er.logger.Debug("reported resource removal",
@@ -172,7 +166,6 @@ func (er *StatusManager) GetStatusSummary() StatusSummary {
 	failedResources := make([]FailedResourceInfo, 0, len(er.failedResourceCache))
 	var latestUpdate time.Time
 
-	// Convert the cache to the expected status format and find the latest update timestamp
 	for _, failedEntry := range er.failedResourceCache {
 		if failedEntry.Timestamp.After(latestUpdate) {
 			latestUpdate = failedEntry.Timestamp
@@ -191,8 +184,8 @@ func (er *StatusManager) GetStatusSummary() StatusSummary {
 	}
 }
 
-// GetChannel returns the update channel for controller-runtime integration
-func (er *StatusManager) GetChannel() chan event.GenericEvent {
+// GetConnection returns the update channel for controller-runtime integration
+func (er *StatusManager) GetConnection() chan event.GenericEvent {
 	return er.triggerChannel
 }
 
